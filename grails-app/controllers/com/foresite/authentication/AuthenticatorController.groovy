@@ -58,6 +58,7 @@ class AuthenticatorController {
     
     def register(){
         def authenticatorSessionVarName = grailsApplication.config.authenticator.sessionVariableName ?: "authenticator"
+        def hostname = grailsApplication.config.authenticator.hostname ?: "example.com"
         def issuerName = grailsApplication.config.authenticator.issuerName ?: "Default Issuer"
                    
         // use the getUser closure to get the username that we will associate with this.
@@ -71,7 +72,9 @@ class AuthenticatorController {
         
             session['authenticator.key'] = key
             
-            def url = authenticatorService.generateQRCodeURL(username.split("@")[0], username.split("@")[1], key, issuerName)
+            def email =  username.split("@")
+            
+            def url = authenticatorService.generateQRCodeURL(email[0], email.size > 1 ? username.split("@")[1] : hostname, key, issuerName)
         
             return render(view:"register", model:[key:key, url:url])
         } else {

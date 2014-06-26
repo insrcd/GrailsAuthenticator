@@ -5,7 +5,7 @@ import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 import org.apache.commons.codec.binary.Base32
 
-// entirely copied from http://www.javacodegeeks.com/2011/12/google-authenticator-using-it-with-your.html
+// mostly copied from http://www.javacodegeeks.com/2011/12/google-authenticator-using-it-with-your.html
 
 @Transactional
 class AuthenticatorService {
@@ -73,12 +73,9 @@ class AuthenticatorService {
 
         int offset = hash[20 - 1] & 0xF;
   
-        // We're using a long because Java hasn't got unsigned int.
         long truncatedHash = 0;
         for (int i = 0; i < 4; ++i) {
             truncatedHash <<= 8;
-            // We are dealing with signed bytes:
-            // we just keep the first byte.
             truncatedHash |= (hash[offset + i] & 0xFF);
         }
 
