@@ -60,9 +60,13 @@ class AuthenticatorController {
         def authenticatorSessionVarName = grailsApplication.config.authenticator.sessionVariableName ?: "authenticator"
         def issuerName = grailsApplication.config.authenticator.issuerName ?: "Default Issuer"
                    
+        // use the getUser closure to get the username that we will associate with this.
+        
         def username = grailsApplication.config.authenticator.getUser()
         
         if (!params.code){
+            // create a key temporarily with the authenticator - stored in the session, probably can be more secure with this
+                  
             def key = session['authenticator.key'] ?: authenticatorService.generateKey()
         
             session['authenticator.key'] = key
@@ -76,16 +80,15 @@ class AuthenticatorController {
             def timeUnits = new Date().getTime() / TimeUnit.SECONDS.toMillis(30) as Long
             
             if (!authenticatorService.checkCode(key, params.code as Long, timeUnits)){
-                return render(view:"success", model:[message:"register", error:"Code doesn't match"])
+                return render(view:"register", model:[message:"register", error:"Code doesn't match"])
             }
                         
-            def authenticator = new Authenticator(secretKey:key, lastAuthentication:new Date(), user:username)
-                     
-            
-            
+            def authenticator = new Authenticator(secretKey:key, lastAuthentication:new Date(), user:username)                     
+                  
             if (authenticator.save()){
                 if (grailsApplication.config.authenticator.useSession){
                     session[authenticatorSessionVarName] = authenticator.id
+                    session['authenticator.key'] = null; // clear the authenticator key.
                 }
                 
                 return render(view:"success", model:[message:"You have successfully setup two factory authentication."])
