@@ -32,6 +32,10 @@ class AuthenticatorController {
         
         def key = authenticator.secretKey
         
+        if (!params.code){
+            return render([authenticator:authenticator, model:[message:"Authenticate with this service."]])
+        }
+        
         def timeUnits = new Date().getTime() / TimeUnit.SECONDS.toMillis(30) as Long
                   
         if (authenticatorService.checkCode(key, params.code as Long, timeUnits)){
