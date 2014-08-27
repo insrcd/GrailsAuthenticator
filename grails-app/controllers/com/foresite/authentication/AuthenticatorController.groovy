@@ -33,7 +33,7 @@ class AuthenticatorController {
         def key = authenticator.secretKey
         
         if (!params.code){
-            return render([authenticator:authenticator, model:[message:"Authenticate with this service."]])
+            return render(view:"authenticate", model:[message:"Authenticate with this service.",authenticator:authenticator])
         }
         
         def timeUnits = new Date().getTime() / TimeUnit.SECONDS.toMillis(30) as Long
@@ -43,7 +43,7 @@ class AuthenticatorController {
           
             authenticator.lastAuthentication = new Date()
                     
-            authenticator.save()
+            authenticator.save(flush:true)
             
             session[authenticatorSessionVarName] = authenticator.id
             
@@ -60,6 +60,12 @@ class AuthenticatorController {
         def authenticatorSessionVarName = grailsApplication.config.authenticator.sessionVariableName ?: "authenticator"
         def hostname = grailsApplication.config.authenticator.hostname ?: "example.com"
         def issuerName = grailsApplication.config.authenticator.issuerName ?: "Default Issuer"
+        
+        def authenticator = Authenticator.findByUser(grailsApplication.config.authenticator.getUser())
+        
+        if (authenticator){
+            return render(view:"error", model:[message:"An authenticator is already registered to your user, you cannot register another one."])
+        }
                    
         // use the getUser closure to get the username that we will associate with this.
         
@@ -74,7 +80,7 @@ class AuthenticatorController {
             
             def email =  username.split("@")
             
-            def url = authenticatorService.generateQRCodeURL(email[0], email.size > 1 ? username.split("@")[1] : hostname, key, issuerName)
+            def url = authenticatorService.generateQRCodeURL(email[0], email.length > 1 ? username.split("@")[1] : hostname, key, issuerName)
         
             return render(view:"register", model:[key:key, url:url])
         } else {
@@ -86,7 +92,7 @@ class AuthenticatorController {
                 return render(view:"register", model:[message:"register", error:"Code doesn't match"])
             }
                         
-            def authenticator = new Authenticator(secretKey:key, lastAuthentication:new Date(), user:username)                     
+            authenticator = new Authenticator(secretKey:key, lastAuthentication:new Date(), user:username)                     
                   
             if (authenticator.save()){
                 if (grailsApplication.config.authenticator.useSession){
@@ -94,7 +100,7 @@ class AuthenticatorController {
                     session['authenticator.key'] = null; // clear the authenticator key.
                 }
                 
-                return render(view:"success", model:[message:"You have successfully setup two factory authentication."])
+                return render(view:"success", model:[message:"You have successfully setup two factor authentication."])
             } else {
                 println authenticator.error
             }
