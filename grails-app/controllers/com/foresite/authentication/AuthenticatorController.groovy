@@ -61,7 +61,7 @@ class AuthenticatorController {
         def hostname = grailsApplication.config.authenticator.hostname ?: "example.com"
         def issuerName = grailsApplication.config.authenticator.issuerName ?: "Default Issuer"
         
-        def authenticator = Authenticator.findByUser(grailsApplication.config.authenticator.getUser())
+        def authenticator = Authenticator.findByUserIlike(grailsApplication.config.authenticator.getUser())
         
         if (authenticator){
             return render(view:"error", model:[message:"An authenticator is already registered to your user, you cannot register another one."])
