@@ -4,7 +4,7 @@ class Authenticator {
     
     String id
     
-    String user
+    String username
     String secretKey
     
     Date dateCreated

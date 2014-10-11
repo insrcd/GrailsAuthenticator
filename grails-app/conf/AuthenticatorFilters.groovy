@@ -20,7 +20,7 @@ class AuthenticatorFilters {
                     if ( grailsApplication.config.authenticator.useSession){
                         authenticator = com.foresite.authentication.Authenticator.get(session[authenticatorSessionVarName])              
                     } else {
-                        authenticator = com.foresite.authentication.Authenticator.findByUser(grailsApplication.config.authenticator.getUser())
+                        authenticator = com.foresite.authentication.Authenticator.findByUsername(grailsApplication.config.authenticator.getUser())
                     }    
                     // make sure the last authentiation was within the threshhold
                     def authenticated = authenticator ? authenticator.lastAuthentication?.after(new Date()-expireDays) : false
