@@ -19,6 +19,27 @@ class AuthenticatorController {
         
         return render([result:authenticatorService.checkCode(key, params.code as Long, timeUnits)] as JSON)
     }
+
+    def isAuthenticated(){
+        def authenticatorSessionVarName = grailsApplication.config.authenticator.sessionVariableName ?: "authenticator"
+
+        def expireDays = grailsApplication.config.authenticator.expireDays ?: 30
+        def excludeControllers = grailsApplication.config.authenticator.excludeControllers ?: []
+
+        def authenticator
+
+        if ( grailsApplication.config.authenticator.useSession){
+            authenticator = Authenticator.get(session[authenticatorSessionVarName])
+        } else {
+            authenticator = Authenticator.findByUsername(grailsApplication.config.authenticator.getUser())
+        }
+
+        def authenticated = authenticator ? authenticator.lastAuthentication?.after(new Date()-expireDays) : false
+
+        return render([result:[authenticated:authenticated,
+                               hasAuthenticator:authenticator != null,
+                               authenticatorEnabled:grailsApplication.config.authenticator.enabled], ] as JSON)
+    }
     
     def authenticate(){
         
