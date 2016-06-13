@@ -54,6 +54,9 @@ class AuthenticatorController {
         def key = authenticator.secretKey
         
         if (!params.code){
+            if (params.format == "popup") {
+                return render(template:"popup", model:[message:"Authenticate with this service.",authenticator:authenticator])
+            }
             return render(view:"authenticate", model:[message:"Authenticate with this service.",authenticator:authenticator])
         }
         
@@ -67,8 +70,13 @@ class AuthenticatorController {
             authenticator.save(flush:true)
             
             session[authenticatorSessionVarName] = authenticator.id
-            
-            return redirect(uri:"/")
+
+            if (params.format != "json") {
+                return redirect(uri: "/")
+            } else {
+                return render([message:"Authentication Successful"] as JSON)
+            }
+
         } else {
             authenticator.failedAuthentications += 1
             authenticator.save()
@@ -76,6 +84,8 @@ class AuthenticatorController {
             return [error:"Incorrect code."]
         }
     }
+
+
     
     def register(){
         def authenticatorSessionVarName = grailsApplication.config.authenticator.sessionVariableName ?: "authenticator"
