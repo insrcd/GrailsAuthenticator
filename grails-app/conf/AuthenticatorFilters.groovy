@@ -30,9 +30,9 @@ class AuthenticatorFilters {
                         && !excludeControllers.contains(controllerName)
                         && !authenticated
                         && grailsApplication.config.authenticator.enabled){
-                    
+
                    
-                        redirect(uri:"/authenticator/authenticate?next=/${controllerName}/${actionName}${ params.id ? "/${params.id}" : "" }")
+                        redirect(uri:"/authenticator/authenticate?next=/${controllerName ? "$controllerName" : ""}${actionName ? "/$actionName" : ""}${ params.id ? "/$params.id" : "" }")
                         
                         return false
                     
