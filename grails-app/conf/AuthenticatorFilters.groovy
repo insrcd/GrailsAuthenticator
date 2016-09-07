@@ -25,15 +25,14 @@ class AuthenticatorFilters {
                     // make sure the last authentiation was within the threshhold
                     def authenticated = authenticator ? authenticator.lastAuthentication?.after(new Date()-expireDays) : false
                 
-                    if (controllerName != 'authenticator' 
-                        && controllerName != 'assets' 
+                    if (controllerName != 'authenticator'
                         && controllerName != 'login' 
                         && !excludeControllers.contains(controllerName)
                         && !authenticated
                         && grailsApplication.config.authenticator.enabled){
                     
                    
-                        redirect(uri:"/authenticator/authenticate")
+                        redirect(uri:"/authenticator/authenticate?next=/${controllerName}/${actionName}${ params.id ? "/${params.id}" : "" }")
                         
                         return false
                     

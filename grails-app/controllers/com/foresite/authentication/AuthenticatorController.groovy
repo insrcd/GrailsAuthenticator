@@ -72,7 +72,7 @@ class AuthenticatorController {
             session[authenticatorSessionVarName] = authenticator.id
 
             if (params.format != "json") {
-                return redirect(uri: "/")
+                return redirect(uri: params.next ? params.next : "/")
             } else {
                 return render([message:"Authentication Successful"] as JSON)
             }
