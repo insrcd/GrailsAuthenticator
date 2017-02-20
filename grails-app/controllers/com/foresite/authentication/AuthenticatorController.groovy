@@ -59,7 +59,7 @@ class AuthenticatorController {
             }
             return render(view:"authenticate", model:[message:"Authenticate with this service.",authenticator:authenticator])
         }
-        
+        params.code.replaceAll("\\s","")
         def timeUnits = new Date().getTime() / TimeUnit.SECONDS.toMillis(30) as Long
                   
         if (authenticatorService.checkCode(key, params.code as Long, timeUnits)){
