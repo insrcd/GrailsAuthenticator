@@ -59,10 +59,15 @@ class AuthenticatorController {
             }
             return render(view:"authenticate", model:[message:"Authenticate with this service.",authenticator:authenticator])
         }
-        params.code.replaceAll("\\s","")
+        def authCode = params.code.replaceAll("\\s","")
+
+        if (!authCode.isNumber()) {
+            return [error:"Incorrect code"]
+        }
+
         def timeUnits = new Date().getTime() / TimeUnit.SECONDS.toMillis(30) as Long
                   
-        if (authenticatorService.checkCode(key, params.code as Long, timeUnits)){
+        if (authenticatorService.checkCode(key, authCode as Long, timeUnits)){
             flash.message = "Authentication successful"
           
             authenticator.lastAuthentication = new Date()
