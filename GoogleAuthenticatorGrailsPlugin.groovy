@@ -11,7 +11,7 @@ class GoogleAuthenticatorGrailsPlugin {
     // TODO Fill in these fields
     def title = "Google Authenticator Plugin" // Headline display name of the plugin
     def author = "Adam Shaw"
-    def authorEmail = "adam.shaw@foresite.com"
+    def authorEmail = "discourse@gmail.com"
     def description = '''\
 Plugin to use google authenticator as a two factor authentication source.
 '''
